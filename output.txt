@@ -1,1 +1,1 @@
-Good mornning, Sasha!
+allowedProgram.includes(program);

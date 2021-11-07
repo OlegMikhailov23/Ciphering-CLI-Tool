@@ -1,4 +1,4 @@
-const rotCode = (str, toDo) => {
+const rotCoder = (str, toDo) => {
     str = [...str];
     let result= []
     if (toDo === 'R1') {
@@ -29,4 +29,4 @@ const rotCode = (str, toDo) => {
 
 }
 
-module.exports = rotCode;
+module.exports = rotCoder;

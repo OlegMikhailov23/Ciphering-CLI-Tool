@@ -1,19 +1,25 @@
-const cesarCode = (str, toDo) => {
+const cesarCoder = (str, toDo) => {
     str = [...str];
     let result= []
     if (toDo === 'C1') {
         result = str.map(char => {
             const asciiNum = char.charCodeAt();
-            if (asciiNum >= 65 && asciiNum <= 90 || asciiNum >= 97 && asciiNum <= 122 ) {
+            if (asciiNum >= 65 && asciiNum < 90 || asciiNum >= 97 && asciiNum < 122 ) {
                 return String.fromCharCode(asciiNum + 1);
+            }
+            if (asciiNum === 90 || asciiNum === 122 ) {
+                return String.fromCharCode(asciiNum - 25);
             }
             return char
         })
     } else if (toDo === 'C0') {
         result = str.map(char => {
             const asciiNum = char.charCodeAt();
-            if (asciiNum >= 65 && asciiNum <= 90 || asciiNum >= 97 && asciiNum <= 122 ) {
+            if (asciiNum > 65 && asciiNum <= 90 || asciiNum > 97 && asciiNum <= 122 ) {
                 return String.fromCharCode(asciiNum - 1);
+            }
+            if (asciiNum === 65 || asciiNum === 97 ) {
+                return String.fromCharCode(asciiNum + 25);
             }
             return char
         })
@@ -23,4 +29,4 @@ const cesarCode = (str, toDo) => {
 
 }
 
-module.exports = cesarCode;
+module.exports = cesarCoder;

@@ -1,6 +1,7 @@
 const { Transform } = require('stream');
-const cesar = require('./codecs/cesarCode');
-const rot = require('./codecs/rot');
+const cesar = require('./codecs/cesarCoder');
+const rot = require('./codecs/rotCoder');
+const atbash = require('./codecs/atbashCoder');
 const args = require('./args');
 const programsCode = require('./consts/programs');
 
@@ -20,6 +21,9 @@ class Coder extends Transform {
                     return;
                 case programsCode.rotEncode:
                     tmp = rot(tmp, programsCode.rotEncode);
+                    return;
+                case programsCode.atbashCoder:
+                    tmp = atbash(tmp);
                     return;
                 default:
                     break;
