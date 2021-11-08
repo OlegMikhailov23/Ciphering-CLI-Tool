@@ -1,1 +1,1 @@
-allowedProgram.includes(program);
+This is secret. Message about "_" symbol!
