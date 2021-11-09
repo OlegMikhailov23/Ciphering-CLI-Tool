@@ -21,31 +21,32 @@ const CODEC_STREAM = {
     R0: rotDecodeStream,
 };
 
-const codeProgramsArr = codeProgram.split('-').map(program => new CODEC_STREAM[program]);
 const isCorrectProgram = checkPrograms();
 
 if (!isCorrectProgram) {
     stderr.write('Попробуйте ещё раз запустить файл c командами С0, C1, A, R1 или R0  🛑\n');
-    process.exitCode = 1;
+    process.exit(1);
 }
 
 if (codeFlag !== '-c') {
     stderr.write('Попробуйте ещё раз запустить файл с флагом -c  🛑\n');
-    process.exitCode = 1;
+    process.exit(1);
 }
 
 if (inputFlag !== '-i') {
     stderr.write('Укажите входной файл с флагом -i  🛑\n');
-    process.exitCode = 1;
+    process.exit(1);
 }
 
 if (outputFlag !== '-o') {
     stderr.write('Укажите выходной файл с флагом -o  🛑\n');
-    process.exitCode = 1;
+    process.exit(1);
 }
 
 let readStream = fs.createReadStream(inputPoint);
 let writeStream = fs.createWriteStream(outputPoint);
+
+const codeProgramsArr = codeProgram.split('-').map(program => new CODEC_STREAM[program]);
 
 (async function start() {
     try{
