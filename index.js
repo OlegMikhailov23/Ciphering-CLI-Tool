@@ -1,18 +1,28 @@
 const fs = require('fs');
 const { stdout, stderr, exit } = process;
-const coder = require('./coder');
+const cesarEncodeStream = require('./streams/cesarEncodeStream');
+const cesarDecodeStream = require('./streams/cesarDecodeStream');
+const atbashStream = require('./streams/atbashStream');
+const rotEncodeStream = require('./streams/rotEncodeStream');
+const rotDecodeStream = require('./streams/rotDecodeStream')
 const args = require('./args');
-const checkPrograms = require('./utils/validatePrograms');
 const { pipeline } = require('stream');
 const { promisify } = require('util');
-
 const pipelineAsync = promisify(pipeline);
 
+const checkPrograms = require('./utils/validatePrograms');
 
 const [codeFlag, codeProgram, inputFlag, inputPoint, outputFlag, outputPoint] = args;
+const CODEC_STREAM = {
+    C1: cesarEncodeStream,
+    C0: cesarDecodeStream,
+    A: atbashStream,
+    R1: rotEncodeStream,
+    R0: rotDecodeStream,
+};
 
-const codeProgramsArr = [ coder ];
-const isCorrectProgram = !checkPrograms(codeProgram.split('-')).includes(false);
+const codeProgramsArr = codeProgram.split('-').map(program => new CODEC_STREAM[program]);
+const isCorrectProgram = checkPrograms();
 
 if (!isCorrectProgram) {
     stderr.write('Попробуйте ещё раз запустить файл c командами С0, C1, A, R1 или R0  🛑\n');
@@ -47,8 +57,6 @@ let writeStream = fs.createWriteStream(outputPoint);
         stdout.write(`Done 🤘👀. Программа кодировки: ${codeProgram}\n`);
     }
     catch(err) {
-        stderr.write('pipeline failed with error:');
+        stderr.write('pipeline failed with error:', err);
     }
 })();
-
-
