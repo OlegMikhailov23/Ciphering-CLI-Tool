@@ -1,13 +1,13 @@
 const fs = require('fs');
-const { stdout, stderr, exit } = process;
+const {stdout, stderr} = process;
 const cesarEncodeStream = require('./streams/cesarEncodeStream');
 const cesarDecodeStream = require('./streams/cesarDecodeStream');
 const atbashStream = require('./streams/atbashStream');
 const rotEncodeStream = require('./streams/rotEncodeStream');
-const rotDecodeStream = require('./streams/rotDecodeStream')
+const rotDecodeStream = require('./streams/rotDecodeStream');
 const args = require('./args');
-const { pipeline } = require('stream');
-const { promisify } = require('util');
+const {pipeline} = require('stream');
+const {promisify} = require('util');
 const pipelineAsync = promisify(pipeline);
 
 const checkPrograms = require('./utils/validatePrograms');
@@ -43,21 +43,21 @@ if (outputFlag !== '-o') {
     process.exit(1);
 }
 
-let readStream = fs.createReadStream(inputPoint);
-let writeStream = fs.createWriteStream(outputPoint);
+let readInputStream = fs.createReadStream(inputPoint);
+let writeOtputStream = fs.createWriteStream(outputPoint,
+    {flags: 'a'});
 
 const codeProgramsArr = codeProgram.split('-').map(program => new CODEC_STREAM[program]);
 
 (async function start() {
-    try{
+    try {
         await pipelineAsync(
-            readStream,
+            readInputStream,
             ...codeProgramsArr,
-            writeStream,
+            writeOtputStream,
         );
         stdout.write(`Done 🤘👀. Программа кодировки: ${codeProgram}\n`);
-    }
-    catch(err) {
+    } catch (err) {
         stderr.write('pipeline failed with error:', err);
     }
 })();
