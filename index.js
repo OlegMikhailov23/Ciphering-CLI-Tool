@@ -1,18 +1,18 @@
 const fs = require('fs');
-const {stdout, stderr} = process;
+const {stdout, stderr, stdin} = process;
+const dateNow = require('./utils/dateNow');
+const stream = require('stream');
 const cesarEncodeStream = require('./streams/cesarEncodeStream');
 const cesarDecodeStream = require('./streams/cesarDecodeStream');
 const atbashStream = require('./streams/atbashStream');
 const rotEncodeStream = require('./streams/rotEncodeStream');
 const rotDecodeStream = require('./streams/rotDecodeStream');
-const args = require('./args');
 const {pipeline} = require('stream');
-const {promisify} = require('util');
-const pipelineAsync = promisify(pipeline);
+const parseArgs = require('./utils/parseArgs');
+const validateProgram = require('./utils/validatePrograms');
+const readline = require('readline');
+const Readable = require('stream').Readable
 
-const checkPrograms = require('./utils/validatePrograms');
-
-const [codeFlag, codeProgram, inputFlag, inputPoint, outputFlag, outputPoint] = args;
 const CODEC_STREAM = {
     C1: cesarEncodeStream,
     C0: cesarDecodeStream,
@@ -21,43 +21,78 @@ const CODEC_STREAM = {
     R0: rotDecodeStream,
 };
 
-const isCorrectProgram = checkPrograms();
+const superArgs = parseArgs();
+const isInputExist = fs.existsSync(superArgs.inputFile);
+const isOutputExist = fs.existsSync(superArgs.outputFile);
 
-if (!isCorrectProgram) {
-    stderr.write('Попробуйте ещё раз запустить файл c командами С0, C1, A, R1 или R0  🛑\n');
+let readInputStream;
+let writeOtputStream;
+validateProgram();
+
+if (isInputExist === false && superArgs.inputFile !== undefined) {
+    stderr.write(`${dateNow()} Invalid path of input file 🚫🛻\n`);
     process.exit(1);
 }
 
-if (codeFlag !== '-c') {
-    stderr.write('Попробуйте ещё раз запустить файл с флагом -c  🛑\n');
+if (isOutputExist === false && superArgs.outputFile !== undefined) {
+    stderr.write(`${dateNow()} Invalid path of output file 🚫🛻\n`);
     process.exit(1);
 }
+const codeProgramsArr = superArgs.config.split('-').map(program => new CODEC_STREAM[program]);
 
-if (inputFlag !== '-i') {
-    stderr.write('Укажите входной файл с флагом -i  🛑\n');
-    process.exit(1);
+const start = () => {
+    pipeline(
+        readInputStream,
+        ...codeProgramsArr,
+        writeOtputStream,
+        (err) => {
+            if (err) {
+                stderr.write(`${dateNow()} pipeline failed with error: ${err} \n`);
+            } else {
+                stdout.write(`${dateNow()} Done 🤘👀.\n`)
+            }
+        }
+    );
 }
 
-if (outputFlag !== '-o') {
-    stderr.write('Укажите выходной файл с флагом -o  🛑\n');
-    process.exit(1);
+if (!superArgs.inputFile && superArgs.outputFile) {
+    writeOtputStream = fs.createWriteStream(superArgs.outputFile,
+        {flags: 'a'}
+    )
+    let rl = readline.createInterface({
+        input: stdin,
+        output: stdout,
+    });
+
+    rl.question(`${dateNow()} Please inter a string ➡️ `, function saveInput(string) {
+        readInputStream = new Readable();
+        readInputStream.push(`${string}\n`);
+        readInputStream.push(null);
+        rl.close();
+    });
+
+    rl.on("close", function saveInput() {
+
+        start();
+    });
 }
 
-let readInputStream = fs.createReadStream(inputPoint);
-let writeOtputStream = fs.createWriteStream(outputPoint,
-    {flags: 'a'});
+if (superArgs.inputFile && !superArgs.outputFile) {
+    writeOtputStream = new stream.Writable();
+    readInputStream = fs.createReadStream(superArgs.inputFile);
+    writeOtputStream._write = function (chunk, encoding, done) {
+        stdout.write(`Look at result ✅ : ${chunk.toString()} \n`);
+        done();
+    };
 
-const codeProgramsArr = codeProgram.split('-').map(program => new CODEC_STREAM[program]);
+    start()
+}
 
-(async function start() {
-    try {
-        await pipelineAsync(
-            readInputStream,
-            ...codeProgramsArr,
-            writeOtputStream,
-        );
-        stdout.write(`Done 🤘👀. Программа кодировки: ${codeProgram}\n`);
-    } catch (err) {
-        stderr.write('pipeline failed with error:', err);
-    }
-})();
+if (superArgs.inputFile && superArgs.outputFile) {
+    readInputStream = fs.createReadStream(superArgs.inputFile);
+    writeOtputStream = fs.createWriteStream(superArgs.outputFile,
+        {flags: 'a'}
+    )
+
+    start();
+}
