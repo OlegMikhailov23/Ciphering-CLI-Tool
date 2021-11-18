@@ -15,13 +15,12 @@ const validatePrograms = (string) => {
     return result;
 }
 
-const parseArgs = () => {
+const parseArgs = (inputArgs) => {
     const args = {};
-    const allArgs = process.argv.slice(2, process.argv.length);
     let countConfig = 0;
     let countPoints = 0;
 
-    allArgs.forEach((arg, idx) => {
+    inputArgs.forEach((arg, idx) => {
         const isConfig = validatePrograms(arg);
         const isPoint = /.txt$/;
         const isFile = /\.[0-9a-z]+$/i
@@ -32,36 +31,48 @@ const parseArgs = () => {
             countPoints += 1;
         }
         if (arg === '--config' || arg === '-c') {
-            args.config = allArgs[idx + 1];
+            if (!args.config) {
+                args.config = inputArgs[idx + 1];
+            } else {
+                stderr.write(`Must be only 1 argument --config or -c 🔴\n`);
+                process.exit(1);
+            }
+
         }
 
-        if ((arg === '--input' || arg === '-i') && isFile.test(allArgs[idx + 1])) {
+        if ((arg === '--input' || arg === '-i') && isFile.test(inputArgs[idx + 1])) {
             if (!args.inputFile) {
-                args.inputFile = allArgs[idx + 1];
+                args.inputFile = inputArgs[idx + 1];
             } else {
                 stderr.write(`${dateNow()} Must be only 1 argument --input or -i 🔴\n`);
                 process.exit(1);
             }
+        } else if (arg === '--input' || arg === '-i') {
+            stderr.write(`Must be only 1 argument --input or -i 🔴\n`);
+            process.exit(1);
         }
 
-        if ((arg === '--output' || arg === '-o') && isFile.test(allArgs[idx + 1]) === true) {
+        if ((arg === '--output' || arg === '-o') && isFile.test(inputArgs[idx + 1]) === true) {
             if (!args.outputFile) {
-                args.outputFile = allArgs[idx + 1];
+                args.outputFile = inputArgs[idx + 1];
             } else {
-                stderr.write(`${dateNow()} Must be only 1 argument --output or -o 🔴\n`);
+                stderr.write(`Must be only 1 argument --output or -o 🔴\n`);
                 process.exit(1);
             }
+        } else if (arg === '--output' || arg === '-o') {
+            stderr.write(`Must be only 1 argument --output or -o 🔴\n`);
+            process.exit(1);
         }
     });
     if (countConfig > 1) {
-        stderr.write(`${dateNow()} Must be only 1 argument after -c or --config 🔴\n`);
+        stderr.write(`Must be only 1 argument after -c or --config 🔴\n`);
         process.exit(1);
     }
     if (countPoints > 2) {
-        stderr.write(`${dateNow()} Must be only 1 argument after -i or -o 🔴\n`);
+        stderr.write(`Must be only 1 argument after -i or -o 🔴\n`);
         process.exit(1);
     }
-    stdout.write(`${dateNow()} Hooray, we have passed parser ✅ \n`);
+    stdout.write(`Hooray, we have passed parser ✅ \n`);
 
     return args;
 }

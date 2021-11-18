@@ -3,8 +3,9 @@ const dateNow = require('./dateNow')
 const programs = require('../consts/programs');
 const allowedProgram = [programs.atbashCoder, programs.rotDecode, programs.cesarDecode, programs.cesarEncode, programs.rotEncode];
 const parseArgs = require('./parseArgs');
+const args = require("../args");
 
-const superArgs = parseArgs();
+const superArgs = parseArgs(args);
 
 const validatePrograms = () => {
     superArgs.config.split('-').forEach(program => {
