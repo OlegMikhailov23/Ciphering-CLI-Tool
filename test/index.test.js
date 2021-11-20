@@ -2,6 +2,10 @@ const parseArgs = require('../utils/parseArgs');
 const validatePrograms = require('../utils/validatePrograms')
 const errorCasesMock = require('../test/mock/errorCasesMock');
 const successCasesMock = require('../test/mock/successCasesMock');
+const cesarMock = require('./mock/casarMock');
+const cesarEncode = require('../codecs/cesarEncode');
+const cesarDecode = require('../codecs/cesarDecode');
+
 test('Should check parsing', () => {
     expect(parseArgs(errorCasesMock.case1)).toEqual({
             config: 'C1-C0',
@@ -112,4 +116,50 @@ describe('Success scenarios from task', () => {
 
         spy.mockRestore();
     })
+})
+
+describe('Ceasar code tests', () => {
+    test('Should check cesar encode', () => {
+        expect(cesarEncode(cesarMock.case1)).toBe(
+            'Iz njof obnf jt Dftbs!'
+
+        );
+    });
+
+    test('Should check cesar encode', () => {
+        expect(cesarEncode(cesarMock.case2)).toBe(
+            'Uftujoh jt bxtpnf, jt opu ju?'
+        );
+    });
+
+    test('Should check cesar encode', () => {
+        expect(cesarEncode(cesarMock.case3)).toBe(
+            'А если накидать русских буков и кучу знаков?).,::, Xibu xjmm zpvs dpefd ep xjui bmm pg ju?'
+        );
+    });
+
+    test('Should check cesar encode', () => {
+        expect(cesarEncode(cesarMock.case4)).toBe(
+            'b'
+
+        );
+    });
+
+    test('Should check cesar decode', () => {
+        expect(cesarDecode('Iz njof obnf jt Dftbs!')).toBe(
+            cesarMock.case1
+        );
+    });
+
+    test('Should check cesar decode', () => {
+        expect(cesarDecode('Uftujoh jt bxtpnf, jt opu ju?')).toBe(
+            cesarMock.case2
+        );
+    });
+
+    test('Should check cesar decode', () => {
+        expect(cesarDecode('А если накидать русских буков и кучу знаков?).,::, Xibu xjmm zpvs dpefd ep xjui bmm pg ju?')).toBe(
+            cesarMock.case3
+        );
+    });
 })
