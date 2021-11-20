@@ -1,5 +1,6 @@
+const fs = require('fs');
 const programs = require('../consts/programs');
-const {stdout, stderr} = process;
+const { stderr } = process;
 const allowedProgram = [programs.atbashCoder, programs.rotDecode, programs.cesarDecode, programs.cesarEncode, programs.rotEncode];
 const dateNow = require('./dateNow')
 
@@ -37,7 +38,6 @@ const parseArgs = (inputArgs) => {
                 stderr.write(`Must be only 1 argument --config or -c 🔴\n`);
                 process.exit(1);
             }
-
         }
 
         if ((arg === '--input' || arg === '-i') && isFile.test(inputArgs[idx + 1])) {
@@ -68,11 +68,29 @@ const parseArgs = (inputArgs) => {
         stderr.write(`Must be only 1 argument after -c or --config 🔴\n`);
         process.exit(1);
     }
+
     if (countPoints > 2) {
         stderr.write(`Must be only 1 argument after -i or -o 🔴\n`);
         process.exit(1);
     }
-    stdout.write(`Hooray, we have passed parser ✅ \n`);
+
+    const isInputExist = fs.existsSync(args.inputFile);
+    const isOutputExist = fs.existsSync(args.outputFile);
+
+    if (isInputExist === false && args.inputFile !== undefined) {
+        stderr.write(`Invalid path of input file 🚫🛻\n`);
+        process.exit(1);
+    }
+
+    if (isOutputExist === false && args.outputFile !== undefined) {
+        stderr.write(`Invalid path of output file 🚫🛻\n`);
+        process.exit(1);
+    }
+
+    if (!args.config) {
+        stderr.write(`Must be atleast one config 🔴\n`);
+        process.exit(1);
+    }
 
     return args;
 }

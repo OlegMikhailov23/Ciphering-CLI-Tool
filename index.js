@@ -23,24 +23,11 @@ const CODEC_STREAM = {
 };
 
 const superArgs = parseArgs(args);
-console.log(args)
-const isInputExist = fs.existsSync(superArgs.inputFile);
-const isOutputExist = fs.existsSync(superArgs.outputFile);
 
 let readInputStream;
 let writeOutputStream;
 
-validateProgram();
-
-if (isInputExist === false && superArgs.inputFile !== undefined) {
-    stderr.write(`${dateNow()} Invalid path of input file 🚫🛻\n`);
-    process.exit(1);
-}
-
-if (isOutputExist === false && superArgs.outputFile !== undefined) {
-    stderr.write(`${dateNow()} Invalid path of output file 🚫🛻\n`);
-    process.exit(1);
-}
+validateProgram(superArgs.config);
 const codeProgramsArr = superArgs.config.split('-').map(program => new CODEC_STREAM[program]);
 
 const start = () => {
