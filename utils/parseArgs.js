@@ -44,7 +44,7 @@ const parseArgs = (inputArgs) => {
             if (!args.inputFile) {
                 args.inputFile = inputArgs[idx + 1];
             } else {
-                stderr.write(`${dateNow()} Must be only 1 argument --input or -i 🔴\n`);
+                stderr.write(`Must be only 1 argument --input or -i 🔴\n`);
                 process.exit(1);
             }
         } else if (arg === '--input' || arg === '-i') {

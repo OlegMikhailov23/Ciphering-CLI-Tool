@@ -8,6 +8,7 @@ const cesarDecode = require('../codecs/cesarDecode');
 const atbashCoder = require('../codecs/atbashCoder');
 const rotEncode = require('../codecs/rotEncode');
 const rotDecode = require('../codecs/rotDecode');
+const dateNow = require('../utils/dateNow');
 
 describe('Initial test, to sure, that it works 👾', () => {
     test('Should check parsing', () => {
@@ -110,6 +111,36 @@ describe('Error scenarios from task 🤖', () => {
         expect(process.exit).toHaveBeenCalledWith(1);
         mockExit.mockRestore();
         spy.mockRestore();
+    })
+
+    test('Should be error with duplicate -i or --input args', () =>{
+        const spy = jest.spyOn(process.stderr, 'write');
+        const mockExit = jest.spyOn(process, 'exit').mockImplementationOnce(() => {
+            throw new Error('process.exit() was called.')
+        });
+
+        expect(() => {
+            parseArgs(errorCasesMock.case8);
+        }).toThrow('process.exit() was called.');
+        expect(spy.mock.calls).toEqual([[`Must be only 1 argument --input or -i 🔴\n`]]);
+        expect(process.exit).toHaveBeenCalledWith(1);
+        mockExit.mockRestore();
+        spy.mockRestore()
+    })
+
+    test('Should be error with duplicate -o or --output arguments', () =>{
+        const spy = jest.spyOn(process.stderr, 'write');
+        const mockExit = jest.spyOn(process, 'exit').mockImplementationOnce(() => {
+            throw new Error('process.exit() was called.')
+        });
+
+        expect(() => {
+            parseArgs(errorCasesMock.case9);
+        }).toThrow('process.exit() was called.');
+        expect(spy.mock.calls).toEqual([[`Must be only 1 argument --output or -o 🔴\n`]]);
+        expect(process.exit).toHaveBeenCalledWith(1);
+        mockExit.mockRestore();
+        spy.mockRestore()
     })
 });
 
@@ -246,6 +277,14 @@ describe('Should check validation of config', () => {
         const res = validateConfig('C1-C0-A-R0-R1-C1-AAA-C1')
         expect(res).toBe(
             false
+        );
+    });
+})
+describe('Should return correct date', () => {
+    test('Try date', () => {
+        const date = dateNow();
+        expect(date).toEqual(
+            `[${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}]`
         );
     });
 })
