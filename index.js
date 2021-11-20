@@ -7,10 +7,11 @@ const cesarDecodeStream = require('./streams/cesarDecodeStream');
 const atbashStream = require('./streams/atbashStream');
 const rotEncodeStream = require('./streams/rotEncodeStream');
 const rotDecodeStream = require('./streams/rotDecodeStream');
-const {pipeline} = require('stream');
-const parseArgs = require('./utils/parseArgs');
+const { pipeline } = require('stream');
+const { parseArgs } = require('./utils/parseArgs');
 const validateProgram = require('./utils/validatePrograms');
 const readline = require('readline');
+const args = require("./args");
 const Readable = require('stream').Readable
 
 const CODEC_STREAM = {
@@ -21,30 +22,19 @@ const CODEC_STREAM = {
     R0: rotDecodeStream,
 };
 
-const superArgs = parseArgs();
-const isInputExist = fs.existsSync(superArgs.inputFile);
-const isOutputExist = fs.existsSync(superArgs.outputFile);
+const superArgs = parseArgs(args);
 
 let readInputStream;
-let writeOtputStream;
-validateProgram();
+let writeOutputStream;
 
-if (isInputExist === false && superArgs.inputFile !== undefined) {
-    stderr.write(`${dateNow()} Invalid path of input file 🚫🛻\n`);
-    process.exit(1);
-}
-
-if (isOutputExist === false && superArgs.outputFile !== undefined) {
-    stderr.write(`${dateNow()} Invalid path of output file 🚫🛻\n`);
-    process.exit(1);
-}
+validateProgram(superArgs.config);
 const codeProgramsArr = superArgs.config.split('-').map(program => new CODEC_STREAM[program]);
 
 const start = () => {
     pipeline(
         readInputStream,
         ...codeProgramsArr,
-        writeOtputStream,
+        writeOutputStream,
         (err) => {
             if (err) {
                 stderr.write(`${dateNow()} pipeline failed with error: ${err} \n`);
@@ -56,7 +46,7 @@ const start = () => {
 }
 
 if (!superArgs.inputFile && superArgs.outputFile) {
-    writeOtputStream = fs.createWriteStream(superArgs.outputFile,
+    writeOutputStream = fs.createWriteStream(superArgs.outputFile,
         {flags: 'a'}
     )
     let rl = readline.createInterface({
@@ -78,9 +68,9 @@ if (!superArgs.inputFile && superArgs.outputFile) {
 }
 
 if (superArgs.inputFile && !superArgs.outputFile) {
-    writeOtputStream = new stream.Writable();
+    writeOutputStream = new stream.Writable();
     readInputStream = fs.createReadStream(superArgs.inputFile);
-    writeOtputStream._write = function (chunk, encoding, done) {
+    writeOutputStream._write = function (chunk, encoding, done) {
         stdout.write(`Look at result ✅ : ${chunk.toString()} \n`);
         done();
     };
@@ -90,7 +80,7 @@ if (superArgs.inputFile && !superArgs.outputFile) {
 
 if (superArgs.inputFile && superArgs.outputFile) {
     readInputStream = fs.createReadStream(superArgs.inputFile);
-    writeOtputStream = fs.createWriteStream(superArgs.outputFile,
+    writeOutputStream = fs.createWriteStream(superArgs.outputFile,
         {flags: 'a'}
     )
 
