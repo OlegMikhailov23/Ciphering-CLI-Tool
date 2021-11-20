@@ -17,16 +17,10 @@
   },
 
   "jest": {
-    "collectCoverageFrom": [
-      "**/*.{js,jsx}",
-      "!**/node_modules/**",
-      "!**/vendor/**",
-      "!**/coverage/**",
-      "!**/streams/**"
-    ],
     "coverageThreshold": {
       "global": {
-        "lines": 70
+        "lines": 70,
+        "branches": 85
       }
     }
   }
