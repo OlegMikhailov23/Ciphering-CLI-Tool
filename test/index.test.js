@@ -1,18 +1,23 @@
-const parseArgs = require('../utils/parseArgs');
+const { parseArgs, validateConfig } = require('../utils/parseArgs');
 const validatePrograms = require('../utils/validatePrograms')
 const errorCasesMock = require('../test/mock/errorCasesMock');
 const successCasesMock = require('../test/mock/successCasesMock');
-const cesarMock = require('./mock/casarMock');
+const coderMock = require('./mock/coderMock');
 const cesarEncode = require('../codecs/cesarEncode');
 const cesarDecode = require('../codecs/cesarDecode');
+const atbashCoder = require('../codecs/atbashCoder');
+const rotEncode = require('../codecs/rotEncode');
+const rotDecode = require('../codecs/rotDecode');
 
-test('Should check parsing', () => {
-    expect(parseArgs(errorCasesMock.case1)).toEqual({
-            config: 'C1-C0',
-            inputFile: './input.txt',
-            outputFile: './output.txt'
-        }
-    );
+describe('Initial test, to sure, that it works 👾', () => {
+    test('Should check parsing', () => {
+        expect(parseArgs(errorCasesMock.case1)).toEqual({
+                config: 'C1-C0',
+                inputFile: './input.txt',
+                outputFile: './output.txt'
+            }
+        );
+    });
 });
 
 describe('Error scenarios from task 🤖', () => {
@@ -120,26 +125,26 @@ describe('Success scenarios from task', () => {
 
 describe('Ceasar code tests', () => {
     test('Should check cesar encode', () => {
-        expect(cesarEncode(cesarMock.case1)).toBe(
+        expect(cesarEncode(coderMock.case1)).toBe(
             'Iz njof obnf jt Dftbs!'
 
         );
     });
 
     test('Should check cesar encode', () => {
-        expect(cesarEncode(cesarMock.case2)).toBe(
+        expect(cesarEncode(coderMock.case2)).toBe(
             'Uftujoh jt bxtpnf, jt opu ju?'
         );
     });
 
     test('Should check cesar encode', () => {
-        expect(cesarEncode(cesarMock.case3)).toBe(
+        expect(cesarEncode(coderMock.case3)).toBe(
             'А если накидать русских буков и кучу знаков?).,::, Xibu xjmm zpvs dpefd ep xjui bmm pg ju?'
         );
     });
 
     test('Should check cesar encode', () => {
-        expect(cesarEncode(cesarMock.case4)).toBe(
+        expect(cesarEncode(coderMock.case4)).toBe(
             'b'
 
         );
@@ -147,19 +152,100 @@ describe('Ceasar code tests', () => {
 
     test('Should check cesar decode', () => {
         expect(cesarDecode('Iz njof obnf jt Dftbs!')).toBe(
-            cesarMock.case1
+            coderMock.case1
         );
     });
 
     test('Should check cesar decode', () => {
         expect(cesarDecode('Uftujoh jt bxtpnf, jt opu ju?')).toBe(
-            cesarMock.case2
+            coderMock.case2
         );
     });
 
     test('Should check cesar decode', () => {
         expect(cesarDecode('А если накидать русских буков и кучу знаков?).,::, Xibu xjmm zpvs dpefd ep xjui bmm pg ju?')).toBe(
-            cesarMock.case3
+            coderMock.case3
+        );
+    });
+})
+
+describe('Atbash code tests', () => {
+    test('Should check atbash encode', () => {
+        expect(atbashCoder(coderMock.case1)).toBe(
+            'Sb nrmv mznv rh Xvhzi!'
+        );
+    });
+
+    test('Should check atbash encode', () => {
+        expect(atbashCoder(coderMock.case2)).toBe(
+            'Gvhgrmt rh zdhlnv, rh mlg rg?'
+        );
+    });
+
+    test('Should check atbash encode', () => {
+        expect(atbashCoder(coderMock.case3)).toBe(
+            'А если накидать русских буков и кучу знаков?).,::, Dszg droo blfi xlwvx wl drgs zoo lu rg?'
+        );
+    });
+})
+
+describe('ROT code tests', () => {
+    test('Should check ROT encode', () => {
+        expect(rotEncode(coderMock.case1)).toBe(
+            'Pg uqvm vium qa Kmaiz!'
+        );
+    });
+
+    test('Should check ROT encode', () => {
+        expect(rotEncode(coderMock.case2)).toBe(
+            'Bmabqvo qa ieawum, qa vwb qb?'
+        );
+    });
+
+    test('Should check ROT encode', () => {
+        expect(rotEncode(coderMock.case3)).toBe(
+            'А если накидать русских буков и кучу знаков?).,::, Epib eqtt gwcz kwlmk lw eqbp itt wn qb?'
+        );
+    });
+
+    test('Should check ROT decode', () => {
+        expect(rotDecode(coderMock.case1)).toBe(
+            'Zq eafw fsew ak Uwksj!'
+        );
+    });
+
+    test('Should check ROT decode', () => {
+        expect(rotDecode(coderMock.case2)).toBe(
+            'Lwklafy ak sokgew, ak fgl al?'
+        );
+    });
+
+    test('Should check ROT decode', () => {
+        expect(rotDecode(coderMock.case4)).toBe(
+            's'
+        );
+    });
+})
+
+describe('Should check validation of config', () => {
+    test('Should return true with: C1-C0', () => {
+        const res = validateConfig('C1-C0')
+        expect(res).toBe(
+            true
+        );
+    });
+
+    test('Should return true with: C1-C0-A-R0-R1-C1', () => {
+        const res = validateConfig('C1-C0-A-R0-R1-C1')
+        expect(res).toBe(
+            true
+        );
+    });
+
+    test('Should return false with: C1-C0-A-R0-R1-C1-AAA-C1', () => {
+        const res = validateConfig('C1-C0-A-R0-R1-C1-AAA-C1')
+        expect(res).toBe(
+            false
         );
     });
 })

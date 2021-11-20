@@ -5,7 +5,7 @@ const allowedProgram = [programs.atbashCoder, programs.rotDecode, programs.cesar
 const dateNow = require('./dateNow')
 
 
-const validatePrograms = (string) => {
+const validateConfig = (string) => {
     let result = true;
     string.split('-').forEach(program => {
         if (!allowedProgram.includes(program)) {
@@ -22,7 +22,7 @@ const parseArgs = (inputArgs) => {
     let countPoints = 0;
 
     inputArgs.forEach((arg, idx) => {
-        const isConfig = validatePrograms(arg);
+        const isConfig = validateConfig(arg);
         const isPoint = /.txt$/;
         const isFile = /\.[0-9a-z]+$/i
         if (isConfig) {
@@ -95,4 +95,4 @@ const parseArgs = (inputArgs) => {
     return args;
 }
 
-module.exports = parseArgs;
+module.exports = { parseArgs , validateConfig };
